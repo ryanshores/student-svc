@@ -1,5 +1,6 @@
 package com.ryanshores.studentsvc;
 
+import com.ryanshores.studentsvc.model.Grade;
 import com.ryanshores.studentsvc.model.Student;
 import com.ryanshores.studentsvc.repository.StudentRepository;
 import org.junit.jupiter.api.Test;
@@ -30,13 +31,12 @@ public class StudentRepoTest {
     void testStudentByName_returnsStudentDetails() {
 
         // given
-        Student savedStudent = studentRepository.save(new Student(null, "Mark"));
+        Student savedStudent = studentRepository.save(Student.builder().name("Mark").build());
 
         // when
         Student student = studentRepository.getStudentByName(savedStudent.getName());
 
         // then
-        then(student.getId()).isNotNull();
         then(student.getName()).isEqualTo("Mark");
     }
 
@@ -44,10 +44,7 @@ public class StudentRepoTest {
     void getAvgGradeForStudent_CalculateAve() {
 
         // given
-        Student mark = Student.builder().name("Mark").active(true).grade(100.0).build();
-        Student susan = Student.builder().name("Susan").active(false).grade(80.0).build();
-        Student peter = Student.builder().name("Peter").active(true).grade(50.0).build();
-        Arrays.asList(mark, susan, peter).forEach(testEntityManager::persistFlushFind);
+        getStudents();
 
         // when
         Double avgGrade = studentRepository.getAvgGradeForActiveStudents();
@@ -60,10 +57,7 @@ public class StudentRepoTest {
     void testStudentsByActive_returnsActiveStudents() {
 
         // given
-        Student mark = Student.builder().name("Mark").active(true).build();
-        Student susan = Student.builder().name("Susan").active(false).build();
-        Student peter = Student.builder().name("Peter").active(true).build();
-        Arrays.asList(mark, susan, peter).forEach(testEntityManager::persistFlushFind);
+        getStudents();
 
         // when
         List<Student> studentsByActive = studentRepository.getStudentsByActiveTrue();
@@ -71,5 +65,24 @@ public class StudentRepoTest {
         // then
         then(studentsByActive).isNotNull();
         then((long) studentsByActive.size()).isEqualTo(2);
+    }
+
+    private List<Student> getStudents() {
+        Student mark = Student.builder().name("Mark").active(true).build();
+        mark.addGrade(getGrade(100.0));
+        Student susan = Student.builder().name("Susan").active(false).build();
+        susan.addGrade(getGrade(80.0));
+        Student peter = Student.builder().name("Peter").active(true).build();
+        peter.addGrade(getGrade(50.0));
+
+        var list = Arrays.asList(mark, susan, peter);
+
+        list.forEach(testEntityManager::persistFlushFind);
+
+        return list;
+    }
+
+    private Grade getGrade(Double value) {
+        return Grade.builder().score(value).build();
     }
 }

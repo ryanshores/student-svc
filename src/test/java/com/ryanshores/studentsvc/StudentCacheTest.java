@@ -33,7 +33,7 @@ public class StudentCacheTest {
 
         // given
         long id = 123L;
-        given(repo.findById(id)).willReturn(Optional.of(new Student(id, "Mark")));
+        given(repo.findById(id)).willReturn(Optional.of(Student.builder().build()));
 
         // when
         service.getById(id);

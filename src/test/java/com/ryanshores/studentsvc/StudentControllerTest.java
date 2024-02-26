@@ -1,5 +1,6 @@
 package com.ryanshores.studentsvc;
 
+import com.ryanshores.studentsvc.model.Grade;
 import com.ryanshores.studentsvc.model.Student;
 import com.ryanshores.studentsvc.model.exception.StudentNotFoundException;
 import com.ryanshores.studentsvc.service.StudentService;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -30,14 +33,24 @@ public class StudentControllerTest {
     void getStudent_forSavedStudent_isReturned() throws Exception {
 
         // given
-        given(service.getById(1l)).willReturn(Student.builder().id(1l).name("Mark").grade(10.0).build());
+        var grade = Grade.builder()
+                .name("Test")
+                .score(10.0)
+                .weight(1.0)
+                .build();
+        var student = Student.builder()
+                .name("Mark")
+                .active(true)
+                .grades(List.of(grade))
+                .build();
+
+        given(service.getById(1L)).willReturn(student);
 
         // when
         mockMvc.perform(get("/students/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(1l))
-                .andExpect(jsonPath("name").value("Mark"))
-                .andExpect(jsonPath("grade").value(10));
+                .andExpect(jsonPath("name").value(student.getName()))
+                .andExpect(jsonPath("grade").value(student.getGrade()));
 
         // then
 

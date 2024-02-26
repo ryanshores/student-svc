@@ -12,7 +12,7 @@ public interface StudentRepository extends CrudRepository<Student, Long> {
 
     Student getStudentByName(String name);
 
-    @Query("select avg (s.grade) from Student s where s.active")
+    @Query("select avg (g.score) from Student s join Grade g on s.id = g.student.id where s.active")
     Double getAvgGradeForActiveStudents();
 
     List<Student> getStudentsByActiveTrue();
