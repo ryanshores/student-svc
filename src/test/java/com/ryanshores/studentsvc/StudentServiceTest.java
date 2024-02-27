@@ -1,5 +1,6 @@
 package com.ryanshores.studentsvc;
 
+import com.ryanshores.studentsvc.model.Grade;
 import com.ryanshores.studentsvc.model.Student;
 import com.ryanshores.studentsvc.model.exception.StudentNotFoundException;
 import com.ryanshores.studentsvc.repository.StudentRepository;
@@ -8,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.assertj.core.api.BDDAssertions.then;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class StudentServiceTest {
@@ -33,8 +33,7 @@ public class StudentServiceTest {
         Student student = service.getById(savedStudent.getId());
 
         // then
-        then(student.getName()).isEqualTo(savedStudent.getName());
-        then(student.getId()).isEqualTo(savedStudent.getId());
+        assertEquals(savedStudent, student);
     }
 
     @Test
@@ -44,9 +43,22 @@ public class StudentServiceTest {
         long badId = -1L;
 
         // when
-        Throwable throwable = catchThrowable(() -> service.getById(badId));
+        assertThrows(StudentNotFoundException.class, () -> service.getById(badId));
 
         // then
-        then(throwable).isInstanceOf(StudentNotFoundException.class);
+    }
+
+    @Test
+    void addGrade_forSavedStudent_isAdded() {
+
+        // given
+        var grade = Grade.builder().build();
+        var student = repo.save(Student.builder().build());
+
+        // when
+        var updatedStudent = service.addGrade(student.getId(), grade);
+
+        // then
+        assertEquals(1, updatedStudent.getGrades().size());
     }
 }

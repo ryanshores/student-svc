@@ -26,7 +26,7 @@ public class Grade extends Base {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Grade grade = (Grade) o;
-        return Objects.equals(name, grade.name) && Objects.equals(score, grade.score) && Objects.equals(weight, grade.weight) && Objects.equals(student, grade.student);
+        return Objects.equals(name, grade.name) && Objects.equals(score, grade.score) && Objects.equals(weight, grade.weight);
     }
 
     @Override

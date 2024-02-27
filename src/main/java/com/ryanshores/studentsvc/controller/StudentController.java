@@ -1,5 +1,6 @@
 package com.ryanshores.studentsvc.controller;
 
+import com.ryanshores.studentsvc.model.Grade;
 import com.ryanshores.studentsvc.model.Student;
 import com.ryanshores.studentsvc.model.exception.StudentNotFoundException;
 import com.ryanshores.studentsvc.service.StudentService;
@@ -25,8 +26,19 @@ public class StudentController {
     @PostMapping("/students/{id}")
     Student updateStudent(@PathVariable Long id,
                           @RequestBody Student student) {
-        // service.updateStudent(student);
-        return service.getById(id);
+        return service.save(student);
+    }
+
+    @PostMapping("/students/{id}/grade")
+    Student addGrade(@PathVariable Long id,
+                     @RequestBody Grade grade) {
+        return service.addGrade(id, grade);
+    }
+
+    @DeleteMapping("/students/{id}/grade/{gradeId}")
+    Student removeGrade(@PathVariable Long id,
+                        @PathVariable Long gradeId) {
+        return service.removeGrade(id, gradeId);
     }
 
     @ExceptionHandler

@@ -1,5 +1,8 @@
 package com.ryanshores.studentsvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ryanshores.studentsvc.model.Grade;
 import com.ryanshores.studentsvc.model.Student;
 import com.ryanshores.studentsvc.model.exception.StudentNotFoundException;
@@ -15,7 +18,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,6 +70,28 @@ public class StudentControllerTest {
         // when
         mockMvc.perform(get("/students/1"))
                 .andExpect(status().isNotFound());
+
+        // then
+
+    }
+
+    @Test
+    void updateStudent_forSavedStudent_returnsUpdated() throws Exception {
+
+        // given
+        var student = Student.builder().name("Mark").build();
+        given(service.save(student)).willReturn(student);
+        given(service.getById(1)).willReturn(student);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
+        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
+        String requestJson = ow.writeValueAsString(student);
+
+        // when
+        mockMvc.perform(post("/students/1").contentType(APPLICATION_JSON_UTF8).content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value(student.getName()));
 
         // then
 
